@@ -1,4 +1,4 @@
-# Face Anti-Spoofing using Deep-Pixel-wise-Binary-Supervision
+# Face Anti-Spoofing using CNN
 
 
 - This Project implements the DeePixBiS model using Python OpenCV, and the Pytorch Framework. This project is inspired from https://github.com/voqtuyen/deep-pix-bis-pad.pytorch
