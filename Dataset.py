@@ -12,8 +12,8 @@ class PixWiseDataset():
                  smoothing=True, transform=None):
         self.data = pd.read_csv(csvfile)
         self.transform = transform
-        self.map_size = map_size
-        self.label_weight = 0.99 if smoothing else 1.0
+        self.map_size = map_size #size of feature map
+        self.label_weight = 0.99 if smoothing else 1.0 #smoothing is use to smooth the ground truth label mask to deal with noise
 
     def dataset(self):
         images = []
@@ -28,11 +28,11 @@ class PixWiseDataset():
             # img = np.moveaxis(img, 2, 0)
             # img = np.asarray(img)
 
-            label = self.data.iloc[ind]['label']
+            label = self.data.iloc[ind]['label']# value of the label of the image i.e. 0 or 1
             if label == 0:
-                mask = np.ones((1, self.map_size, self.map_size), dtype=np.float32) * (1 - self.label_weight)
+                mask = np.ones((1, self.map_size, self.map_size), dtype=np.float32) * (1 - self.label_weight)#feature map created of 0's
             else:
-                mask = np.ones((1, self.map_size, self.map_size), dtype=np.float32) * (self.label_weight)
+                mask = np.ones((1, self.map_size, self.map_size), dtype=np.float32) * (self.label_weight)#feature map created of 0's
 
             if self.transform:
                 img = self.transform(img)

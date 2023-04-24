@@ -1,6 +1,6 @@
-# Face Anti-Spoofing using CNN
+# Face Anti-Spoofing using Deep-Pixel-wise-Binary-Supervision
 
-
+- Anti-Spoofing for Face Recognition task using the Deep Pixel-wise Binary Supervision Technique. The paper can be found here https://arxiv.org/pdf/1907.04047v1.pdf
 - This Project implements the DeePixBiS model using Python OpenCV, and the Pytorch Framework. This project is inspired from https://github.com/voqtuyen/deep-pix-bis-pad.pytorch
 - The Trained weights are already saved up as './DeePixBiS.pth' file which can be run on the model.
 - Training Data has been taken from the NUAA Imposter dataset (863 images subset)
@@ -31,4 +31,6 @@ The Loss function is a weighted sum using the binary and pixel-wise binary cross
 ### Recognizing
 1. Run `python Test.py`
 
-
+### TODO
+1. Make directories for easy handling of python files.
+2. Add a config file for easy hyperparameters tuning.
