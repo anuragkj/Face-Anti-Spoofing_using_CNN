@@ -52,7 +52,7 @@ val_dl = DataLoader(val_ds, batch_size, shuffle=True, num_workers=0, pin_memory=
 
 # 5 epochs ran
 #The trainer fits the model by iterating over each epoch and calling the train_one_epoch method.
-trainer = Trainer(train_dl, val_dl, model, 20, opt, loss_fn)
+trainer = Trainer(train_dl, val_dl, model, 1, opt, loss_fn)
 
 print('Training Beginning\n')
 trainer.fit()

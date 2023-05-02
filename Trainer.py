@@ -55,10 +55,10 @@ class Trainer():
         test_los = test_loss(self.model, self.val_dl, self.loss_fn)
 
         ###########################################
-        # apcer, bpcer, hter = evaluate(self.model, self.val_dl)
-        # print(f'Test Accuracy : {test_acc}  Test Loss : {test_los}  APCER : {apcer}  BPCER : {bpcer}  HTER : {hter}')
+        apcer, bpcer, hter = evaluate(self.model, self.val_dl)
+        print(f'Test Accuracy : {test_acc}  Test Loss : {test_los}  APCER : {apcer}  BPCER : {bpcer}  HTER : {hter}')
 
-        print(f'Test Accuracy : {test_acc}  Test Loss : {test_los}')
+        #print(f'Test Accuracy : {test_acc}  Test Loss : {test_los}')
         return test_acc, test_los
 
     def fit(self):

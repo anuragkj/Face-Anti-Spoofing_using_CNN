@@ -42,26 +42,35 @@ def test_loss(model, test_dl, loss_fn):
 
 
 #########################
-def evaluate(model, test_dl, threshold=0.5):
-    with torch.no_grad():
-        total = len(test_dl.dataset)
-        apcer = 0
-        bpcer = 0
-        for img, mask, label in test_dl:
+def evaluate(model, test_dl, threshold=0.5): #threshold which is a threshold value for the decision function(0.5 default)
+    total = len(test_dl.dataset)
+    apcer_total = 0
+    bpcer_total = 0
+    for img, mask, label in test_dl:
+        with torch.no_grad():#ensures that PyTorch does not keep track of gradients since we are not training the model
             net_mask, net_label = model(img)
             preds, score = predict(net_mask, net_label, threshold)
 
-            genuine_scores = score[label == 0]
-            attack_scores = score[label == 1]
+        genuine_scores = score[label == 0]
+        attack_scores = score[label == 1]
 
-            # Calculate APCER
-            apcer += torch.sum(attack_scores > threshold).item() / len(attack_scores)
+        #Here, preds is a tensor of predicted labels (0 for genuine and 1 for attack) and label is a tensor of true labels. 
+        #APCER is the proportion of attack samples that were incorrectly classified as genuine by the model, 
+        # so we should sum up the number of attack samples that were misclassified as genuine. We can do this 
+        # by counting the number of times the model predicted "0" (genuine) for an attack sample with label "1"
 
-            # Calculate BPCER
-            bpcer += torch.sum(genuine_scores < threshold).item() / len(genuine_scores)
+        # Calculate APCER
+        #apcer_total += torch.sum(preds[label == 1]).item()#For APCER, it sums up the number of predictions that are 1 and their corresponding labels are also 1 using
+        apcer_total += torch.sum((preds == 0) & (label == 1)).item()
 
-        apcer /= total
-        bpcer /= total
-        hter = (apcer + bpcer) / 2
+        # Calculate BPCER
+        #bpcer_total += torch.sum(1 - preds[label == 0]).item()#For BPCER, it sums up the number of predictions that are 0 and their corresponding labels are also 0 using
+        bpcer_total += torch.sum((preds == 1) & (label == 0)).item()
+    # Calculate APCER and BPCER
+    apcer = apcer_total / total
+    bpcer = bpcer_total / total
+
+    # Calculate HTER
+    hter = (apcer + bpcer) / 2
 
     return apcer, bpcer, hter
