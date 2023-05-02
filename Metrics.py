@@ -39,3 +39,29 @@ def test_loss(model, test_dl, loss_fn):
         losses = loss_fn(net_mask, net_label, mask, label)
         loss += torch.mean(losses).item()
     return loss / total
+
+
+#########################
+def evaluate(model, test_dl, threshold=0.5):
+    with torch.no_grad():
+        total = len(test_dl.dataset)
+        apcer = 0
+        bpcer = 0
+        for img, mask, label in test_dl:
+            net_mask, net_label = model(img)
+            preds, score = predict(net_mask, net_label, threshold)
+
+            genuine_scores = score[label == 0]
+            attack_scores = score[label == 1]
+
+            # Calculate APCER
+            apcer += torch.sum(attack_scores > threshold).item() / len(attack_scores)
+
+            # Calculate BPCER
+            bpcer += torch.sum(genuine_scores < threshold).item() / len(genuine_scores)
+
+        apcer /= total
+        bpcer /= total
+        hter = (apcer + bpcer) / 2
+
+    return apcer, bpcer, hter

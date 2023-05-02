@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
-from Metrics import test_accuracy, test_loss
+from Metrics import test_accuracy, test_loss, evaluate
 
-#trained for 1 epoch
+#trained for 20 epoch, value can be changed from Train.py
 class Trainer():
     def __init__(self, train_dl, val_dl, model, epochs, opt, loss_fn, device='cpu'):
         self.train_dl = train_dl
@@ -32,16 +32,31 @@ class Trainer():
             #After calculating the loss, it sets the optimizer gradients to zero (self.opt.zero_grad()), 
             # backpropagates the loss through the model (loss.backward()), 
             # and updates the model parameters using the optimizer (self.opt.step()).
+            
+            #self.opt.zero_grad() resets the gradients of all the model parameters to zero before computing 
+            # the gradients for the current batch. This is necessary because PyTorch accumulates gradients, 
+            # so if we don't zero out the gradients at each step, the gradients will be accumulated across batches.
+            
             self.opt.zero_grad()
+
+            #loss.backward() computes the gradients of the loss with respect to the model parameters, 
+            # which are then stored in the parameters' grad attributes.
             loss.backward()
+
+            #self.opt.step() updates the model parameters using the optimizer. Specifically, 
+            # it updates the weights of the model by subtracting the gradients multiplied by the learning rate.
             self.opt.step()
 
-            if batch % 9 == 0:
+            if batch % 9 == 0: ##See why this is showing for all batches
                 print(f'Loss : {loss}')
 
         # self.model.eval()
         test_acc = test_accuracy(self.model, self.val_dl)
         test_los = test_loss(self.model, self.val_dl, self.loss_fn)
+
+        ###########################################
+        # apcer, bpcer, hter = evaluate(self.model, self.val_dl)
+        # print(f'Test Accuracy : {test_acc}  Test Loss : {test_los}  APCER : {apcer}  BPCER : {bpcer}  HTER : {hter}')
 
         print(f'Test Accuracy : {test_acc}  Test Loss : {test_los}')
         return test_acc, test_los

@@ -9,8 +9,10 @@ from Metrics import predict, test_accuracy, test_loss
 
 model = DeePixBiS()
 model.load_state_dict(torch.load('./DeePixBiS.pth'))
+#It is used to set the model in evaluation mode
 model.eval()
 
+#tfms are the transformations to apply
 tfms = transforms.Compose([
     transforms.ToPILImage(),
     transforms.Resize((224, 224)),
@@ -33,6 +35,9 @@ while cv.waitKey(1) & 0xFF != ord('q'):
         # cv.imshow('Test', faceRegion)
 
         faceRegion = tfms(faceRegion)
+        #In PyTorch, many operations are designed to operate on batches of tensors, so adding a batch dimension to a single tensor 
+        # can be a useful way to simplify your code. By using unsqueeze(0), you can easily add a batch dimension to a 
+        # tensor without having to create a new array or modify your code to handle the additional dimension.
         faceRegion = faceRegion.unsqueeze(0)
 
         mask, binary = model.forward(faceRegion)
