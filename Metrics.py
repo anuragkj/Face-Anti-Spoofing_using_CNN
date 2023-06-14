@@ -73,4 +73,4 @@ def evaluate(model, test_dl, threshold=0.5): #threshold which is a threshold val
     # Calculate HTER
     hter = (apcer + bpcer) / 2
 
-    return apcer, bpcer, hter
+    return apcer, bpcer, hter, apcer_total, bpcer_total, total
