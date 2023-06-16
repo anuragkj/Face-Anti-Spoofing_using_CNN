@@ -55,6 +55,4 @@ Run the *"mtcnn_live_cam.py"* file or run the following code for live face detec
     video.release()
     cv2.destroyAllWindows()
 
-## Live Camera Output
 
-![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/57293126/104323069-8c2fb180-5507-11eb-9de8-0ace88d632b0.gif)
