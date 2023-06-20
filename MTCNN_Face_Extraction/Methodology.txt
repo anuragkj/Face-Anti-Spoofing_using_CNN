@@ -1,0 +1,17 @@
+Put the training images in Script/Input
+Run script.py
+Copy the output images and paste in PRNET/TestImages
+Download PRN model from https://drive.google.com/file/d/1UoE-XuW1SDLUjZmJPkIZ1MLxvQFgmTFH/view?usp=sharing
+Put in Data/net-data
+Install conda
+conda create -n tensorflow1.15 python=3.6
+conda activate tensorflow1.15
+source activate tensorflow1.15
+conda install -c conda-forge tensorflow=1.15.0
+pip install numpy==1.19.5
+pip install scikit-image
+pip install scipy
+pip install tensorflow-estimator==1.15.0
+pip install cmake
+pip install dlib
+python demo.py -i C:\Users\anura\Documents\Github\Face-Anti-Spoofing_using_CNN\MTCNN_Face_Extraction\PRNet\TestImages -o C:\Users\anura\Documents\Github\Face-Anti-Spoofing_using_CNN\MTCNN_Face_Extraction\PRNet\OutputImages --isDlib True --isDepth True
