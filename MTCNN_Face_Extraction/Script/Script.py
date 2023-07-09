@@ -5,9 +5,9 @@ import cv2
 from mtcnn.mtcnn import MTCNN
 
 # Specify the paths for the input folder containing images, output folder, and the file to store the last number
-input_folder = "./Input"
-output_folder = "./Output"
-last_number_file = "num.txt"
+input_folder = "MTCNN_Face_Extraction/Script/Input"
+output_folder = "MTCNN_Face_Extraction/Script/Output"
+last_number_file = "MTCNN_Face_Extraction/Script/num.txt"
 
 # Create the output folder if it doesn't exist
 os.makedirs(output_folder, exist_ok=True)

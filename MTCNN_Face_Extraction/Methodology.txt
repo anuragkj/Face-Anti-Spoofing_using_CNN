@@ -14,4 +14,5 @@ pip install scipy
 pip install tensorflow-estimator==1.15.0
 pip install cmake
 pip install dlib
-python demo.py -i C:\Users\anura\Documents\Github\Face-Anti-Spoofing_using_CNN\MTCNN_Face_Extraction\PRNet\TestImages -o C:\Users\anura\Documents\Github\Face-Anti-Spoofing_using_CNN\MTCNN_Face_Extraction\PRNet\OutputImages --isDlib True --isDepth True
+cd C:\Users\anura\Documents\Github\Face-Anti-Spoofing_using_CNN\PRNet
+python demo.py -i C:\Users\anura\Documents\Github\Face-Anti-Spoofing_using_CNN\PRNet\TestImages --isDlib True --isDepth True
