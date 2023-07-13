@@ -12,7 +12,7 @@ import cv2
 
 def binary_pixel(test_dir, label, model, faceClassifier, tfms):
 
-    time_begin = datetime.datetime.now()
+    # time_begin = datetime.datetime.now()
     file_list = get_file_list(test_dir)
     count = 0
     true_num = 0
@@ -48,13 +48,13 @@ def binary_pixel(test_dir, label, model, faceClassifier, tfms):
             count += 1
             true_num += 1
         else:
-            print(file)
+            # print(file)
             count += 1
-    print(count, true_num, true_num / count)
+    # print(count, true_num, true_num / count)
 
-    time_end = datetime.datetime.now()
-    time_all = time_end - time_begin
-    print("time_all", time_all.total_seconds())
+    # time_end = datetime.datetime.now()
+    # time_all = time_end - time_begin
+    # print("time_all", time_all.total_seconds())
     
 
 

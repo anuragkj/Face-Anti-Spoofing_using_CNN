@@ -103,7 +103,8 @@ def patch_cnn_single(model, face_detector, img, isface):
             print(e)
 
     # 集成判断
-    print("true_count", true_count, "false_count", false_count)
+    # print("true_count", true_count, "false_count", false_count)
+    print(true_count/(true_count + false_count))
     if true_count >= false_count:
         return 1
     else:
@@ -143,13 +144,13 @@ def patch_cnn_test(args, pre_path, test_dir, label, isface):
             count += 1
             true_num += 1
         else:
-            print(file)
+            # print(file)
             count += 1
-    print(count, true_num, true_num / count)
+    # print(count, true_num, true_num / count)
 
     time_end = datetime.datetime.now()
     time_all = time_end - time_begin
-    print("time_all", time_all.total_seconds())
+    # print("time_all", time_all.total_seconds())
 
 
 if __name__ == '__main__':
