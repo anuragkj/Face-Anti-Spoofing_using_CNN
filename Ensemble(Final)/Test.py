@@ -6,49 +6,73 @@ import numpy as np
 from modules.binary.Model import DeePixBiS
 from modules.binary.Loss import PixWiseBCELoss
 from modules.binary.Metrics import predict, test_accuracy, test_loss
+from modules.patch_depth.lib.processing_utils import get_file_list, FaceDection
+import datetime
+import cv2
 
-model = DeePixBiS()
-model.load_state_dict(torch.load('Ensemble(Final)/modules/binary/DeePixBiS.pth'))
-#It is used to set the model in evaluation mode
-model.eval()
+def binary_pixel(test_dir, label, model, faceClassifier, tfms):
 
-#tfms are the transformations to apply
-tfms = transforms.Compose([
-    transforms.ToPILImage(),
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-])
+    time_begin = datetime.datetime.now()
+    file_list = get_file_list(test_dir)
+    count = 0
+    true_num = 0
+    for file in file_list:
+        img = cv2.imread(file)
+        if img is None:
+            continue
+        
+        grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        faces = faceClassifier.detectMultiScale(grey, scaleFactor=1.1, minNeighbors=4)
 
-faceClassifier = cv.CascadeClassifier('Ensemble(Final)/modules/binary/Classifiers/haarface.xml')
+        for x, y, w, h in faces:
+            faceRegion = img[y:y + h, x:x + w]
+            faceRegion = cv.cvtColor(faceRegion, cv.COLOR_BGR2RGB)
 
-camera = cv.VideoCapture(0)
+            faceRegion = tfms(faceRegion)
+            faceRegion = faceRegion.unsqueeze(0)
 
-while cv.waitKey(1) & 0xFF != ord('q'):
-    _, img = camera.read()
-    grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    faces = faceClassifier.detectMultiScale(grey, scaleFactor=1.1, minNeighbors=4)
+            mask, binary = model.forward(faceRegion)
+            res = torch.mean(mask).item()
+            print(res)
 
-    for x, y, w, h in faces:
-        faceRegion = img[y:y + h, x:x + w]
-        faceRegion = cv.cvtColor(faceRegion, cv.COLOR_BGR2RGB)
-        # cv.imshow('Test', faceRegion)
 
-        faceRegion = tfms(faceRegion)
-        #In PyTorch, many operations are designed to operate on batches of tensors, so adding a batch dimension to a single tensor 
-        # can be a useful way to simplify your code. By using unsqueeze(0), you can easily add a batch dimension to a 
-        # tensor without having to create a new array or modify your code to handle the additional dimension.
-        faceRegion = faceRegion.unsqueeze(0)
-
-        mask, binary = model.forward(faceRegion)
-        res = torch.mean(mask).item()
-        # res = binary.item()
-        print(res)
-        cv.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
         if res < 0.5:
-            cv.putText(img, 'Fake', (x, y + h + 30), cv.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
+            result = 0
         else:
-            cv.putText(img, 'Real', (x, y + h + 30), cv.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
+            result = 1
 
-    cv.imshow('Deep Pixel-wise Binary Supervision Anti-Spoofing', img)
+        if result is None:
+            continue
+        if result == label:
+            count += 1
+            true_num += 1
+        else:
+            print(file)
+            count += 1
+    print(count, true_num, true_num / count)
+
+    time_end = datetime.datetime.now()
+    time_all = time_end - time_begin
+    print("time_all", time_all.total_seconds())
+    
+
+
+if __name__ == '__main__':
+    test_dir = "Ensemble(Final)/test_img_folder"
+    label = 0
+    model = DeePixBiS()
+    model.load_state_dict(torch.load('Ensemble(Final)/modules/binary/DeePixBiS.pth'))
+    #It is used to set the model in evaluation mode
+    model.eval()
+
+    #tfms are the transformations to apply
+    tfms = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+
+    faceClassifier = cv.CascadeClassifier('Ensemble(Final)/modules/binary/Classifiers/haarface.xml')
+    binary_pixel(test_dir=test_dir, label=label, model = model, faceClassifier = faceClassifier, tfms = tfms)
