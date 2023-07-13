@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms as tt
-from lib.processing_utils import get_file_list, get_mean_std
+from modules.patch_depth.lib.processing_utils import get_file_list, get_mean_std
 import cv2
 from PIL import Image
 import os

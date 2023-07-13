@@ -8,10 +8,10 @@ import os
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
 
-from model.depth_based_cnn import net_baesd_depth, depth_test_transform
-from lib.processing_utils import get_file_list, FaceDection
-from lib.model_develop_utils import deploy_base
-from configuration.config_depth import args
+from modules.patch_depth.model.depth_based_cnn import net_baesd_depth, depth_test_transform
+from modules.patch_depth.lib.processing_utils import get_file_list, FaceDection
+from modules.patch_depth.lib.model_develop_utils import deploy_base
+from modules.patch_depth.configuration.config_depth import args
 import torchvision.transforms as ts
 import datetime
 
@@ -107,7 +107,7 @@ def depth_cnn_test(pre_path, test_dir, label, isface):
 if __name__ == '__main__':
     test_dir = "Ensemble(Final)/test_img_folder"
     label = 0
-    pre_path = "Ensemble(Final)/output/models/depth_patch.pth"
+    pre_path = "Ensemble(Final)/modules/patch_depth/output/models/depth_patch.pth"
     isface = True
     depth_cnn_test(pre_path=pre_path, test_dir=test_dir, label=label,
                    isface=isface)

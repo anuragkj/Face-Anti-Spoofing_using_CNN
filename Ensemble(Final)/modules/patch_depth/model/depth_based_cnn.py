@@ -8,8 +8,8 @@ import cv2
 from torchvision.datasets import ImageFolder
 import torch.nn.init as init
 import torch.optim as optim
-from lib.processing_utils import get_mean_std
-from lib.img_dataset import ImgPixelDataset
+from modules.patch_depth.lib.processing_utils import get_mean_std
+from modules.patch_depth.lib.img_dataset import ImgPixelDataset
 
 
 class net_baesd_depth(nn.Module):
