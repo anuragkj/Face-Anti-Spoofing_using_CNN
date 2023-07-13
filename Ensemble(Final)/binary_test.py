@@ -23,7 +23,7 @@ def binary_pixel(test_dir, label, model, faceClassifier, tfms):
         
         grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         faces = faceClassifier.detectMultiScale(grey, scaleFactor=1.1, minNeighbors=4)
-
+        #Add checking code to not crash even if face is not detected
         for x, y, w, h in faces:
             faceRegion = img[y:y + h, x:x + w]
             faceRegion = cv.cvtColor(faceRegion, cv.COLOR_BGR2RGB)

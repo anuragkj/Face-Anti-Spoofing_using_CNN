@@ -58,7 +58,7 @@ class RandomCrop(object):
             i, j, h, w = self.get_params(img, self.size)
         return img_new
 
-
+# Add specific patch detection along with random patches
 def patch_cnn_single(model, face_detector, img, isface):
     '''
 
