@@ -80,8 +80,8 @@ def depth_cnn_test(pre_path, test_dir, label, isface):
 
     time_begin = datetime.datetime.now()
     file_list = get_file_list(test_dir)
-    count = 1
-    true_num = 1
+    count = 0
+    true_num = 0
     for file in file_list:
         img = cv2.imread(file)
         if img is None:
