@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import torch
 import os
+import random
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
@@ -30,9 +31,11 @@ class rgb2ycrcb(object):
 
 class RandomCrop(object):
 
-    def __init__(self, size, seed):
+    def __init__(self, size, seed, path_dir=None, choice=0):
         self.seed = seed
         self.size = (int(size), int(size))
+        self.path_dir = path_dir
+        self.choice = choice
 
     def get_params(self, img, output_size):
         img = np.array(img)
@@ -47,19 +50,35 @@ class RandomCrop(object):
         j = np.random.randint(0, w - tw)
         return i, j, th, tw
 
-    def __call__(self, img):
-        i, j, h, w = self.get_params(img, self.size)
-        img = np.array(img)
-        img_new = img[j:j + h, i:i + w]
-        try:
-            img_new = Image.fromarray(img_new.astype('uint8')).convert('RGB')
-        except Exception as e:
-            print("Image.fromarray(img.astype('uint8')).convert('RGB')")
+    def __call__(self, img):#choice 0 for random, 1 for specific
+        if self.choice == 0:
             i, j, h, w = self.get_params(img, self.size)
-        return img_new
+            img = np.array(img)
+            img_new = img[j:j + h, i:i + w]
+            try:
+                img_new = Image.fromarray(img_new.astype('uint8')).convert('RGB')
+            except Exception as e:
+                print("Image.fromarray(img.astype('uint8')).convert('RGB')")
+                i, j, h, w = self.get_params(img, self.size)
+            return img_new
+        else:
+            cascade_file = cv2.CascadeClassifier(self.path_dir)
+            gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+            specific_patch = cascade_file.detectMultiScale(gray)
+            
+            if len(specific_patch) > 0:
+                eye = random.choice(specific_patch)
+                x, y, w, h = eye
+                detected_patch = img[y:y+h, x:x+w]
+                detected_patch = Image.fromarray(detected_patch)
+                detected_patch = detected_patch.resize(self.size, Image.BILINEAR)
+                return detected_patch
+            else:
+                return None
+    
 
 # Add specific patch detection along with random patches
-def patch_cnn_single(model, face_detector, img, isface):
+def patch_cnn_single(model, face_detector, img, isface, classifiers):
     '''
 
     :param model:
@@ -88,9 +107,24 @@ def patch_cnn_single(model, face_detector, img, isface):
     true_count = 0
     false_count = 0
     for i in range(data_len):
-        img_transform = ts.Compose([RandomCrop(size=patch_size, seed=seed_arr[i])])
+        img_transform = ts.Compose([RandomCrop(size=patch_size, seed=seed_arr[i], path_dir = None, choice = 0)])
         try:
-            img_patch = img_transform(img_Image)
+            img_patch = img_transform(img = img_Image)
+
+            result_one = deploy_base(model=model, img=img_patch, transform=patch_test_transform)
+            result_one=result_one[0]
+
+            if result_one[0] > result_one[1]:
+                false_count += 1
+            else:
+                true_count += 1
+        except Exception as e:
+            print(e)
+
+    for i in classifiers:
+        img_transform = ts.Compose([RandomCrop(size=patch_size, seed=seed_arr[0], path_dir = classifiers[i], choice = 1)])
+        try:
+            img_patch = img_transform(img = face_img)
 
             result_one = deploy_base(model=model, img=img_patch, transform=patch_test_transform)
             result_one=result_one[0]
@@ -103,7 +137,7 @@ def patch_cnn_single(model, face_detector, img, isface):
             print(e)
 
     # 集成判断
-    # print("true_count", true_count, "false_count", false_count)
+    print("true_count", true_count, "false_count", false_count)
     print(true_count/(true_count + false_count))
     if true_count >= false_count:
         return 1
@@ -111,7 +145,7 @@ def patch_cnn_single(model, face_detector, img, isface):
         return 0
 
 
-def patch_cnn_test(args, pre_path, test_dir, label, isface):
+def patch_cnn_test(args, pre_path, test_dir, label, isface, classifiers):
     '''
 
     :param args:
@@ -136,7 +170,7 @@ def patch_cnn_test(args, pre_path, test_dir, label, isface):
         if img is None:
             continue
 
-        result = patch_cnn_single(model=model, face_detector=face_detector, img=img, isface=isface)
+        result = patch_cnn_single(model=model, face_detector=face_detector, img=img, isface=isface, classifiers=classifiers)
 
         if result is None:
             continue
@@ -146,7 +180,7 @@ def patch_cnn_test(args, pre_path, test_dir, label, isface):
         else:
             # print(file)
             count += 1
-    # print(count, true_num, true_num / count)
+    print(count, true_num, true_num / count)
 
     time_end = datetime.datetime.now()
     time_all = time_end - time_begin
@@ -158,5 +192,13 @@ if __name__ == '__main__':
     label = 0
     pre_path = "Ensemble(Final)/modules/patch_depth/output/models/patch_surf.pth"
     isface = True
+    classifiers = {
+        'left_ear' : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_leftear.xml',
+        'left_eye' : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_lefteye.xml',
+        'right_eye': 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_righteye.xml',
+        'right_ear': 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_rightear.xml',
+        'nose'     : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_nose.xml',
+        'mouth'    : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_mouth.xml',
+    }
     patch_cnn_test(args, pre_path=pre_path, test_dir=test_dir, label=label,
-                   isface=isface)
+                   isface=isface, classifiers=classifiers)
