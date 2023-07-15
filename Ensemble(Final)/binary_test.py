@@ -16,45 +16,49 @@ def binary_pixel(test_dir, label, model, faceClassifier, tfms):
     file_list = get_file_list(test_dir)
     count = 0
     true_num = 0
-    for file in file_list:
-        img = cv2.imread(file)
-        if img is None:
-            continue
-        
-        grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        faces = faceClassifier.detectMultiScale(grey, scaleFactor=1.1, minNeighbors=4)
-        #Add checking code to not crash even if face is not detected
-        for x, y, w, h in faces:
-            faceRegion = img[y:y + h, x:x + w]
-            faceRegion = cv.cvtColor(faceRegion, cv.COLOR_BGR2RGB)
+    try:
+        for file in file_list:
+            img = cv2.imread(file)
+            if img is None:
+                continue
+            
+            grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+            faces = faceClassifier.detectMultiScale(grey, scaleFactor=1.1, minNeighbors=4)
+            #Add checking code to not crash even if face is not detected
+            for x, y, w, h in faces:
+                faceRegion = img[y:y + h, x:x + w]
+                faceRegion = cv.cvtColor(faceRegion, cv.COLOR_BGR2RGB)
 
-            faceRegion = tfms(faceRegion)
-            faceRegion = faceRegion.unsqueeze(0)
+                faceRegion = tfms(faceRegion)
+                faceRegion = faceRegion.unsqueeze(0)
 
-            mask, binary = model.forward(faceRegion)
-            res = torch.mean(mask).item()
-            print(res)
+                mask, binary = model.forward(faceRegion)
+                res = torch.mean(mask).item()
+                print(res)
 
 
 
-        if res < 0.5:
-            result = 0
-        else:
-            result = 1
+            if res < 0.5:
+                result = 0
+            else:
+                result = 1
 
-        if result is None:
-            continue
-        if result == label:
-            count += 1
-            true_num += 1
-        else:
-            # print(file)
-            count += 1
-    # print(count, true_num, true_num / count)
+            if result is None:
+                continue
+            if result == label:
+                count += 1
+                true_num += 1
+            else:
+                # print(file)
+                count += 1
+        # print(count, true_num, true_num / count)
 
-    # time_end = datetime.datetime.now()
-    # time_all = time_end - time_begin
-    # print("time_all", time_all.total_seconds())
+        # time_end = datetime.datetime.now()
+        # time_all = time_end - time_begin
+        # print("time_all", time_all.total_seconds())
+
+    except Exception as e:
+        print(e)
     
 
 
