@@ -13,7 +13,7 @@ from modules.patch_depth.lib.processing_utils import get_file_list, FaceDection
 from modules.patch_depth.lib.model_develop_utils import deploy_base
 from modules.patch_depth.configuration.config_depth import args
 import torchvision.transforms as ts
-import datetime
+# import datetime
 
 
 class rgb2ycrcb(object):

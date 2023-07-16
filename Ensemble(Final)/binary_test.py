@@ -10,12 +10,12 @@ from modules.patch_depth.lib.processing_utils import get_file_list, FaceDection
 import datetime
 import cv2
 
-def binary_pixel(test_dir, label, model, faceClassifier, tfms):
+def binary_pixel(test_dir, model, faceClassifier, tfms):
 
     # time_begin = datetime.datetime.now()
     file_list = get_file_list(test_dir)
-    count = 0
-    true_num = 0
+    # count = 0
+    # true_num = 0
     
     for file in file_list:
         img = cv2.imread(file)
@@ -43,14 +43,14 @@ def binary_pixel(test_dir, label, model, faceClassifier, tfms):
             else:
                 result = 1
 
-            if result is None:
-                continue
-            if result == label:
-                count += 1
-                true_num += 1
-            else:
-                # print(file)
-                count += 1
+        #     if result is None:
+        #         continue
+        #     if result == label:
+        #         count += 1
+        #         true_num += 1
+        #     else:
+        #         # print(file)
+        #         count += 1
         except Exception as e:
             print(e)
     # print(count, true_num, true_num / count)
@@ -60,12 +60,10 @@ def binary_pixel(test_dir, label, model, faceClassifier, tfms):
     # print("time_all", time_all.total_seconds())
 
     
-    
 
 
 if __name__ == '__main__':
     test_dir = "Ensemble(Final)/test_img_folder"
-    label = 0
     model = DeePixBiS()
     model.load_state_dict(torch.load('Ensemble(Final)/modules/binary/DeePixBiS.pth'))
     #It is used to set the model in evaluation mode
@@ -80,4 +78,4 @@ if __name__ == '__main__':
     ])
 
     faceClassifier = cv.CascadeClassifier('Ensemble(Final)/modules/binary/Classifiers/haarface.xml')
-    binary_pixel(test_dir=test_dir, label=label, model = model, faceClassifier = faceClassifier, tfms = tfms)
+    binary_pixel(test_dir=test_dir, model = model, faceClassifier = faceClassifier, tfms = tfms)
