@@ -16,12 +16,12 @@ def binary_pixel(test_dir, label, model, faceClassifier, tfms):
     file_list = get_file_list(test_dir)
     count = 0
     true_num = 0
-    try:
-        for file in file_list:
-            img = cv2.imread(file)
-            if img is None:
-                continue
-            
+    
+    for file in file_list:
+        img = cv2.imread(file)
+        if img is None:
+            continue
+        try:
             grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             faces = faceClassifier.detectMultiScale(grey, scaleFactor=1.1, minNeighbors=4)
             #Add checking code to not crash even if face is not detected
@@ -51,14 +51,15 @@ def binary_pixel(test_dir, label, model, faceClassifier, tfms):
             else:
                 # print(file)
                 count += 1
-        # print(count, true_num, true_num / count)
+        except Exception as e:
+            print(e)
+    # print(count, true_num, true_num / count)
 
-        # time_end = datetime.datetime.now()
-        # time_all = time_end - time_begin
-        # print("time_all", time_all.total_seconds())
+    # time_end = datetime.datetime.now()
+    # time_all = time_end - time_begin
+    # print("time_all", time_all.total_seconds())
 
-    except Exception as e:
-        print(e)
+    
     
 
 

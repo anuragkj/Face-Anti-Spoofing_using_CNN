@@ -67,9 +67,10 @@ class RandomCrop(object):
             specific_patch = cascade_file.detectMultiScale(gray)
             
             if len(specific_patch) > 0:
-                eye = random.choice(specific_patch)
-                x, y, w, h = eye
-                detected_patch = img[y:y+h, x:x+w]
+                region = random.choice(specific_patch)
+                x, y, w, h = region
+                ph, tw = self.size
+                detected_patch = img[y-((ph-h)//2):y+h+((ph-h)//2), x-((tw-w)//2):x+w+((tw-w)//2)]
                 detected_patch = Image.fromarray(detected_patch)
                 detected_patch = detected_patch.resize(self.size, Image.BILINEAR)
                 return detected_patch
@@ -120,7 +121,8 @@ def patch_cnn_single(model, face_detector, img, isface, classifiers):
                 true_count += 1
         except Exception as e:
             print(e)
-
+    specific_true = 0
+    specific_false = 0
     for i in classifiers:
         img_transform = ts.Compose([RandomCrop(size=patch_size, seed=seed_arr[0], path_dir = classifiers[i], choice = 1)])
         try:
@@ -131,13 +133,16 @@ def patch_cnn_single(model, face_detector, img, isface, classifiers):
 
             if result_one[0] > result_one[1]:
                 false_count += 1
+                specific_false += 1
             else:
                 true_count += 1
+                specific_true += 1
         except Exception as e:
             print(e)
 
     # 集成判断
     print("true_count", true_count, "false_count", false_count)
+    print("specific_true_count", specific_true, "specific_false_count", specific_false)
     print(true_count/(true_count + false_count))
     if true_count >= false_count:
         return 1
