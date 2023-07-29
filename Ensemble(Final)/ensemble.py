@@ -14,6 +14,7 @@ from modules.patch_depth.model.depth_based_cnn import net_baesd_depth, depth_tes
 from modules.patch_depth.lib.processing_utils import get_file_list, FaceDection
 from modules.patch_depth.lib.model_develop_utils import deploy_base
 from modules.patch_depth.configuration.config_patch import args
+from modules.MesoNet.classifiers import Meso4
 import torchvision.transforms as ts
 
 
@@ -219,8 +220,16 @@ def binary_supervision_single(model, img, faceClassifier, tfms):
         # print(e)
         return None
 
+def deepfake_detection_single(pre_path_deepfake, image):
+    classifier = Meso4()
+    classifier.load(pre_path_deepfake)
+    image = cv2.resize(image, (256, 256)) / 255.0
+    image = np.expand_dims(image, axis=0)  # Add batch dimension (1, 256, 256, 3)
+    prediction = classifier.predict(image)
+    return prediction[0][0]
+
 # Function to go over all images and call the single functions for depth, patch and binary analyis.
-def ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, binary_face_classifier_path, test_dir, isface, classifiers):
+def ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, pre_path_deepfake, binary_face_classifier_path, test_dir, isface, classifiers):
     '''
 
     :param :
@@ -264,6 +273,7 @@ def ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, binary_
         if img is None:
             continue
 
+        result_deepfake = deepfake_detection_single(pre_path_deepfake, img)
         result_depth = depth_cnn_single(model=model_depth, face_detector=face_detector, img=img, isface=isface)
         result_patch = patch_cnn_single(model=model_patch, face_detector=face_detector, img=img, isface=isface, classifiers=classifiers)
         result_binary = binary_supervision_single(model=model_binary_supervision, img = img, faceClassifier = faceClassifier, tfms = tfms)
@@ -271,6 +281,7 @@ def ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, binary_
         print("============================================================")
         print(file)
         print()
+        print("Real Image(Not a deepfake): " + str(result_deepfake))
         print("Depth: " + str(result_depth))
         print("Patch: " + str(result_patch["result"])) #Can use and print other dictionary keys also
         print("Binary Supervision: " + str(result_binary))
@@ -284,6 +295,7 @@ if __name__ == '__main__':
     pre_path_patch = 'Ensemble(Final)/modules/patch_depth/output/models/patch_surf.pth'
     pre_path_depth = 'Ensemble(Final)/modules/patch_depth/output/models/depth_patch.pth'
     pre_path_binary = 'Ensemble(Final)/modules/binary/DeePixBiS.pth'
+    pre_path_deepfake = 'Ensemble(Final)/modules/MesoNet/weights/Meso4_DF.h5'
     isface = True
     classifiers = {
         'left_ear' : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_leftear.xml',
@@ -296,4 +308,4 @@ if __name__ == '__main__':
 
     binary_face_classifier_path = 'Ensemble(Final)/modules/binary/Classifiers/haarface.xml'
     
-    ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, binary_face_classifier_path, test_dir, isface, classifiers)
+    ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, pre_path_deepfake, binary_face_classifier_path, test_dir, isface, classifiers)

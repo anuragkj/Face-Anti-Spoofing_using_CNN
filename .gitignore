@@ -1,3 +1,7 @@
 data/
 __pycache__/
 SimSwap/
+Ensemble(Final)/test_img_folder/
+PRNet/TestImages/
+MTCNN_Face_Extraction/Script/Output
+MTCNN_Face_Extraction/Script/Input
