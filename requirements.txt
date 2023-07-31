@@ -1,0 +1,10 @@
+opencv-python
+Pillow
+torch 
+torchvision
+cmake
+dlib
+tqdm
+torchtoolbox
+matplotlib
+tensorflow
