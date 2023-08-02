@@ -38,7 +38,7 @@ pip install -r requirements.txt
 ```
 
 ## Requirements differences in Mac
-- Upgrade IoS to version 12+
+- Upgrade macOS to version 12+
 - Remove torch from requirements.txt
 - Install [miniconda](https://www.youtube.com/watch?v=BEUU-icPg78)
 - Run the following before following the other conda instructions
