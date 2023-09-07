@@ -5,6 +5,8 @@ from PIL import Image
 import torch
 import os
 import random
+import pandas as pd
+
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
@@ -231,7 +233,7 @@ def deepfake_detection_single(pre_path_deepfake, image):
 # Function to go over all images and call the single functions for depth, patch and binary analyis.
 def ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, 
                   pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, 
-                  test_dir, isface, classifiers):
+                  test_dir, isface, classifiers, output_excel_path, label, train_test):
     '''
 
     :param :
@@ -274,12 +276,24 @@ def ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
+
+    #Finding the excel sheet
+    try:
+        df = pd.read_excel(output_excel_path)
+    except FileNotFoundError:
+        df = pd.DataFrame(columns=['File_Path', 'Train_Test', 'result_deepfake__Meso_4_DF', 'result_deepfake__Meso_4_F2F', 'result_deepfake__Meso_Inc_DF', 'result_deepfake__Meso_Inc_F2F', 'Depth', 'Patch_Surf', 'Patch_Fasd', 'Binary_Supervision', 'Label'])
+
     #Iterating over the files
     file_list = get_file_list(test_dir)
     for file in file_list:
         img = cv2.imread(file)
         if img is None:
             continue
+        try:
+            if file in df['File_Path'].values:
+                continue
+        except:
+            pass
 
         result_deepfake__Meso_4_DF = deepfake_detection_single(pre_path_deepfake_Meso_4_DF, img)
         result_deepfake__Meso_4_F2F = deepfake_detection_single(pre_path_deepfake_Meso_4_F2F, img)
@@ -303,6 +317,27 @@ def ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd
         print("Binary Supervision: " + str(result_binary))
         print()
         print("============================================================")        
+
+
+        # Append the results to the DataFrame
+        new_row = {
+            'File_Path': file,
+            'Train_Test': train_test,
+            'result_deepfake__Meso_4_DF': result_deepfake__Meso_4_DF,
+            'result_deepfake__Meso_4_F2F': result_deepfake__Meso_4_F2F,
+            'result_deepfake__Meso_Inc_DF': result_deepfake__Meso_Inc_DF,
+            'result_deepfake__Meso_Inc_F2F': result_deepfake__Meso_Inc_F2F,
+            'Depth': result_depth,
+            'Patch_Surf': result_patch_surf["result"],
+            'Patch_Fasd': result_patch_fasd["result"],
+            'Binary_Supervision': result_binary,
+            'Label': label
+        }
+
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+
+        # Save the updated DataFrame to the Excel file
+        df.to_excel(output_excel_path, index=False)
 
 
 
@@ -329,6 +364,12 @@ if __name__ == '__main__':
     }
 
     binary_face_classifier_path = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/binary/Classifiers/haarface.xml'
+
+    output_excel_path = "C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/OutputFile/Output.xlsx"
+    label = 1 # 1 if genuine 0 if fake
+    train_test = "train" #test if testing data, train if training data
+
+
     ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, 
                   pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, 
-                  test_dir, isface, classifiers)
+                  test_dir, isface, classifiers, output_excel_path, label, train_test)
