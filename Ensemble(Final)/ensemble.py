@@ -229,7 +229,9 @@ def deepfake_detection_single(pre_path_deepfake, image):
     return prediction[0][0]
 
 # Function to go over all images and call the single functions for depth, patch and binary analyis.
-def ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, test_dir, isface, classifiers):
+def ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, 
+                  pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, 
+                  test_dir, isface, classifiers):
     '''
 
     :param :
@@ -327,4 +329,6 @@ if __name__ == '__main__':
     }
 
     binary_face_classifier_path = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/binary/Classifiers/haarface.xml'
-    ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, test_dir, isface, classifiers)
+    ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, 
+                  pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, 
+                  test_dir, isface, classifiers)
