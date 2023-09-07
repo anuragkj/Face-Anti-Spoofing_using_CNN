@@ -229,7 +229,7 @@ def deepfake_detection_single(pre_path_deepfake, image):
     return prediction[0][0]
 
 # Function to go over all images and call the single functions for depth, patch and binary analyis.
-def ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, pre_path_deepfake, binary_face_classifier_path, test_dir, isface, classifiers):
+def ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, test_dir, isface, classifiers):
     '''
 
     :param :
@@ -248,11 +248,17 @@ def ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, pre_pat
     model_depth.load_state_dict(state_dict_depth)
     model_depth.eval()
 
-    #Preparing patch_model
-    model_patch = net_baesd_patch(args)
-    state_dict_patch = torch.load(pre_path_patch, map_location='cpu')
-    model_patch.load_state_dict(state_dict_patch)
-    model_patch.eval()
+    #Preparing patch_model surf
+    model_patch_surf = net_baesd_patch(args)
+    state_dict_patch_surf = torch.load(pre_path_patch_surf, map_location='cpu')
+    model_patch_surf.load_state_dict(state_dict_patch_surf)
+    model_patch_surf.eval()
+    
+    #Preparing patch_model fasd
+    model_patch_fasd = net_baesd_patch(args)
+    state_dict_patch_fasd = torch.load(pre_path_patch_fasd, map_location='cpu')
+    model_patch_fasd.load_state_dict(state_dict_patch_fasd)
+    model_patch_fasd.eval()
 
     #Preparing binary_model
     faceClassifier = cv2.CascadeClassifier(binary_face_classifier_path)
@@ -273,17 +279,25 @@ def ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, pre_pat
         if img is None:
             continue
 
-        result_deepfake = deepfake_detection_single(pre_path_deepfake, img)
+        result_deepfake__Meso_4_DF = deepfake_detection_single(pre_path_deepfake_Meso_4_DF, img)
+        result_deepfake__Meso_4_F2F = deepfake_detection_single(pre_path_deepfake_Meso_4_F2F, img)
+        result_deepfake__Meso_Inc_DF = deepfake_detection_single(pre_path_deepfake_Meso_Inc_DF, img)
+        result_deepfake__Meso_Inc_F2F = deepfake_detection_single(pre_path_deepfake_Meso_Inc_F2F, img)
         result_depth = depth_cnn_single(model=model_depth, face_detector=face_detector, img=img, isface=isface)
-        result_patch = patch_cnn_single(model=model_patch, face_detector=face_detector, img=img, isface=isface, classifiers=classifiers)
+        result_patch_surf = patch_cnn_single(model=model_patch_surf, face_detector=face_detector, img=img, isface=isface, classifiers=classifiers)
+        result_patch_fasd = patch_cnn_single(model=model_patch_fasd, face_detector=face_detector, img=img, isface=isface, classifiers=classifiers)
         result_binary = binary_supervision_single(model=model_binary_supervision, img = img, faceClassifier = faceClassifier, tfms = tfms)
 
         print("============================================================")
         print(file)
         print()
-        print("Real Image(Not a deepfake): " + str(result_deepfake))
+        print("Real Image(Not a deepfake) result_deepfake__Meso_4_DF: " + str(result_deepfake__Meso_4_DF))
+        print("Real Image(Not a deepfake) result_deepfake__Meso_4_F2F: " + str(result_deepfake__Meso_4_F2F))
+        print("Real Image(Not a deepfake) result_deepfake__Meso_Inc_DF: " + str(result_deepfake__Meso_Inc_DF))
+        print("Real Image(Not a deepfake) result_deepfake__Meso_Inc_F2F: " + str(result_deepfake__Meso_Inc_F2F))
         print("Depth: " + str(result_depth))
-        print("Patch: " + str(result_patch["result"])) #Can use and print other dictionary keys also
+        print("Patch Surf: " + str(result_patch_surf["result"])) #Can use and print other dictionary keys also
+        print("Patch Fasd: " + str(result_patch_fasd["result"])) #Can use and print other dictionary keys also
         print("Binary Supervision: " + str(result_binary))
         print()
         print("============================================================")        
@@ -291,21 +305,26 @@ def ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, pre_pat
 
 
 if __name__ == '__main__':
-    test_dir = 'Ensemble(Final)/test_img_folder'
-    pre_path_patch = 'Ensemble(Final)/modules/patch_depth/output/models/patch_surf.pth'
-    pre_path_depth = 'Ensemble(Final)/modules/patch_depth/output/models/depth_patch.pth'
-    pre_path_binary = 'Ensemble(Final)/modules/binary/DeePixBiS.pth'
-    pre_path_deepfake = 'Ensemble(Final)/modules/MesoNet/weights/Meso4_DF.h5'
+    test_dir = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/test_img_folder'
+    pre_path_patch_surf = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/output/models/patch_surf.pth'
+    pre_path_patch_fasd = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/output/models/patch_fasd.pth'
+    pre_path_depth = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/output/models/depth_patch.pth'
+    pre_path_binary = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/binary/DeePixBiS.pth'
+    pre_path_deepfake_Meso_4_DF = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/MesoNet/weights/Meso4_DF.h5'
+    pre_path_deepfake_Meso_4_F2F = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/MesoNet/weights/Meso4_F2F.h5'
+    pre_path_deepfake_Meso_Inc_DF = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/MesoNet/weights/Meso4_F2F.h5'
+    pre_path_deepfake_Meso_Inc_F2F = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/MesoNet/weights/Meso4_F2F.h5'
+
+
     isface = True
     classifiers = {
-        'left_ear' : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_leftear.xml',
-        'left_eye' : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_lefteye.xml',
-        'right_eye': 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_righteye.xml',
-        'right_ear': 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_rightear.xml',
-        'nose'     : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_nose.xml',
-        'mouth'    : 'Ensemble(Final)\modules\patch_depth\Classifiers\haarcascade_mcs_mouth.xml',
+        'left_ear' : 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/Classifiers/haarcascade_mcs_leftear.xml',
+        'left_eye' : 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/Classifiers/haarcascade_mcs_lefteye.xml',
+        'right_eye': 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/Classifiers/haarcascade_mcs_righteye.xml',
+        'right_ear': 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/Classifiers/haarcascade_mcs_rightear.xml',
+        'nose'     : 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/Classifiers/haarcascade_mcs_nose.xml',
+        'mouth'    : 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/Classifiers/haarcascade_mcs_mouth.xml',
     }
 
-    binary_face_classifier_path = 'Ensemble(Final)/modules/binary/Classifiers/haarface.xml'
-    
-    ensemble_test(args, pre_path_depth, pre_path_patch, pre_path_binary, pre_path_deepfake, binary_face_classifier_path, test_dir, isface, classifiers)
+    binary_face_classifier_path = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/binary/Classifiers/haarface.xml'
+    ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, test_dir, isface, classifiers)
