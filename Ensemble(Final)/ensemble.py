@@ -286,14 +286,28 @@ def ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd
     #Iterating over the files
     file_list = get_file_list(test_dir)
     for file in file_list:
-        img = cv2.imread(file)
-        if img is None:
-            continue
         try:
             if file in df['File_Path'].values:
                 continue
         except:
             pass
+
+
+         # Check if the file is an image or video
+        if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff')):
+            print("img found")
+            img = cv2.imread(file)
+            if img is None:
+                continue
+        elif file.lower().endswith(('.mp4', '.avi', '.mov', '.flv', '.wmv')):
+            print("vid found")
+            video_cap = cv2.VideoCapture(file)
+            ret, frame = video_cap.read()
+            if not ret:
+                continue
+            img = frame
+        else:
+            continue
 
         result_deepfake__Meso_4_DF = deepfake_detection_single(pre_path_deepfake_Meso_4_DF, img)
         result_deepfake__Meso_4_F2F = deepfake_detection_single(pre_path_deepfake_Meso_4_F2F, img)
