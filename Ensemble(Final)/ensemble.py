@@ -356,7 +356,8 @@ def ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd
 
 
 if __name__ == '__main__':
-    test_dir = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/test_img_folder'
+    # test_dir = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/test_img_folder'
+    test_dir = 'D:/FAS_Dataset/face_anti-spoofing/imgs/parallel_fake_1'
     pre_path_patch_surf = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/output/models/patch_surf.pth'
     pre_path_patch_fasd = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/output/models/patch_fasd.pth'
     pre_path_depth = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/patch_depth/output/models/depth_patch.pth'
@@ -379,10 +380,12 @@ if __name__ == '__main__':
 
     binary_face_classifier_path = 'C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/modules/binary/Classifiers/haarface.xml'
 
-    output_excel_path = "C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/OutputFile/Output.xlsx"
-    label = 1 # 1 if genuine 0 if fake
+    output_excel_path = "C:/Users/anura/Documents/Github/Face-Anti-Spoofing_using_CNN/Ensemble(Final)/OutputFile/Output_1.xlsx"
+    label = 0 # 1 if genuine 0 if fake
     train_test = "train" #test if testing data, train if training data
 
+    #Done Replay train real, attack, 
+    # test real, attack
 
     ensemble_test(args, pre_path_depth, pre_path_patch_surf, pre_path_patch_fasd, pre_path_binary, pre_path_deepfake_Meso_4_DF, 
                   pre_path_deepfake_Meso_4_F2F, pre_path_deepfake_Meso_Inc_DF, pre_path_deepfake_Meso_Inc_F2F, binary_face_classifier_path, 
