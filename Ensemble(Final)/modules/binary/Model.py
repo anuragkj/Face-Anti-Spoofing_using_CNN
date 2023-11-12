@@ -2,6 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torchvision import models
+from torchsummary import summary
 # import torch.sigmoid as sigmoid
 
 
@@ -43,11 +44,18 @@ class DeePixBiS(nn.Module):
         out = torch.flatten(out)
         return out_map, out
 
-
+model = DeePixBiS()
+print(summary(model, (3, 224, 224)))
+#Xception already uses pointwise convolution
+#https://github.com/AlbertMP/Use-Xception-For-Face-Anti-Spoofing
+#https://ieeexplore.ieee.org/abstract/document/9248008?casa_token=Kdv3o_aaz5QAAAAA:LHed5fTY2Kzpxey1u9Fm1cX0orxVyGF_EaIEVhT1OSwHEq9n5LrGmdUSVdqJ9MGL2QrXVuRqZvnSiQ
 
 '''
 USING XCEPTION
 https://github.com/chaymabh/Transfer-Learning-with-Xception
+
+using transfer learning with xception: https://github.dev/Lolik111/transfer-learning-tf
+getting layer dimensions: https://stackoverflow.com/questions/55875279/how-to-get-an-output-dimension-for-each-layer-of-the-neural-network-in-pytorch
 
 import torch
 import torch.nn as nn
