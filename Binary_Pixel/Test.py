@@ -46,7 +46,7 @@ while cv.waitKey(1) & 0xFF != ord('q'):
         print(res)
         cv.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-        if res < 0.5:
+        if res < 0.7:
             cv.putText(img, 'Fake', (x, y + h + 30), cv.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
         else:
             cv.putText(img, 'Real', (x, y + h + 30), cv.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
