@@ -32,7 +32,6 @@ from modules.patch_depth.lib.processing_utils import get_file_list, FaceDection
 
 class rgb2ycrcb(object):
     '''
-    自定义transform处理,将rgb图像转ycrcb
     :param object:
     :return:
     '''
@@ -103,7 +102,6 @@ def patch_cnn_single(model, face_detector, img, isface, classifiers):
     '''
     if not isface:
         img = cv2.resize(img, (480, 640))
-        # 人脸检测
         face_img = face_detector.face_detect(img)
 
     else:
@@ -112,7 +110,6 @@ def patch_cnn_single(model, face_detector, img, isface, classifiers):
     if face_img is None:
         return None
 
-    # 随机裁剪
     patch_size = 96
     img_Image = Image.fromarray(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB))
     data_len = 8
@@ -155,7 +152,6 @@ def patch_cnn_single(model, face_detector, img, isface, classifiers):
             pass
             # print(e)
 
-    # 集成判断
     ret_dic = {}
     # print("Patch: ")
     # print("true_count", true_count, "false_count", false_count)
@@ -180,7 +176,6 @@ def depth_cnn_single(model, face_detector, img, isface):
     '''
     if not isface:
         img = cv2.resize(img, (480, 640))
-        # 人脸检测
         face_img = face_detector.face_detect(img)
 
     else:
