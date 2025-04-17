@@ -18,7 +18,6 @@ import torchvision.transforms as ts
 
 class rgb2ycrcb(object):
     '''
-    自定义transform处理,将rgb图像转ycrcb
     :param object:
     :return:
     '''
@@ -39,7 +38,6 @@ def depth_cnn_single(model, face_detector, img, isface):
     '''
     if not isface:
         img = cv2.resize(img, (480, 640))
-        # 人脸检测
         face_img = face_detector.face_detect(img)
 
     else:
