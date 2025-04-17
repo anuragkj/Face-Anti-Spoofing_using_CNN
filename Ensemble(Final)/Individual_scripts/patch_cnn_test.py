@@ -19,7 +19,6 @@ import datetime
 
 class rgb2ycrcb(object):
     '''
-    自定义transform处理,将rgb图像转ycrcb
     :param object:
     :return:
     '''
@@ -90,7 +89,6 @@ def patch_cnn_single(model, face_detector, img, isface, classifiers):
     '''
     if not isface:
         img = cv2.resize(img, (480, 640))
-        # 人脸检测
         face_img = face_detector.face_detect(img)
 
     else:
@@ -99,7 +97,6 @@ def patch_cnn_single(model, face_detector, img, isface, classifiers):
     if face_img is None:
         return None
 
-    # 随机裁剪
     patch_size = 96
     img_Image = Image.fromarray(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB))
     data_len = 8
@@ -140,7 +137,6 @@ def patch_cnn_single(model, face_detector, img, isface, classifiers):
         except Exception as e:
             print(e)
 
-    # 集成判断
     print("true_count", true_count, "false_count", false_count)
     print("specific_true_count", specific_true, "specific_false_count", specific_false)
     print(true_count/(true_count + false_count))
